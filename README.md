@@ -15,7 +15,8 @@ python test_simulation.py   # 9 sanity checks
 One Streamlit page answering one question: if a patrol allocation rule learns from
 *arrest records*, what does it do to an imbalance it inherits? Two districts, identical
 underlying incident rates, one starts with more patrol. You slide the rule's
-**concentration** — how sharply patrol follows the leading district — and watch.
+**concentration** — how sharply patrol follows the leading district and watch.
+In basic terms, it decides where enforcement allocation goes based on learned behavior from past arrest records. It's a simulation of a patrol allocation rule that learns from arrest data, and it shows that how aggressively the rule follows its own signal determines whether an existing racial disparity gets erased, frozen, or blown up.
 
 Three regimes:
 

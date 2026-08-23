@@ -8,7 +8,7 @@ import altair as alt
 import pandas as pd
 import streamlit as st
 
-from generated_data import SimConfig, disparity_ratio, run_simulation
+from simulation import SimConfig, disparity_ratio, run_simulation
 
 st.set_page_config(page_title="Allocation rule check", layout="wide")
 

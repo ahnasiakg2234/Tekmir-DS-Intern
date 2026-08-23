@@ -48,6 +48,11 @@ class SimConfig:
     # "incidents" -> the system learns from underlying incidents (ground truth)
     train_on: str = "arrests"
 
+    # How many rounds' worth of prior records the system was trained on before it
+    # was switched on. Small values leave the Polya urn free to drift a long way
+    # from its starting share, which swamps the effect being demonstrated.
+    prior_rounds: float = 10.0
+
     seed: int = 0
 
 
@@ -89,7 +94,7 @@ def run_simulation(cfg: SimConfig) -> pd.DataFrame:
     # Seed the signal with roughly one round's worth of history, split according
     # to the initial patrol allocation. This stands in for "the records the
     # system was trained on before it was switched on".
-    prior_strength = float(true_rates.sum() * cfg.detection_base)
+    prior_strength = float(true_rates.sum() * cfg.detection_base * cfg.prior_rounds)
     signal = init_share * prior_strength
 
     rows = []
@@ -125,16 +130,26 @@ def run_simulation(cfg: SimConfig) -> pd.DataFrame:
     return df
 
 
-def disparity_ratio(df: pd.DataFrame) -> float:
-    """Final-round ratio of the highest to lowest enforcement rate.
+def disparity_ratio(df: pd.DataFrame, numerator: str = "District A",
+                    denominator: str = "District B") -> float:
+    """Final-round enforcement rate of one district divided by another's.
 
-    Reads as: someone doing the same thing in the most-patrolled district is
-    this many times more likely to be arrested than in the least-patrolled one.
-    Returns 1.0 when the districts are treated identically.
+    Reads as: someone doing the same thing in `numerator` is this many times more
+    likely to be arrested than in `denominator`.
+
+    Directional on purpose. An earlier version returned max/min, which took the
+    absolute value of random drift and so reported a ratio above 1.0 even when the
+    districts were treated identically, biasing the average upward.
+
+    Returns inf when the denominator district records no arrests at all — total
+    capture is not parity, and an earlier version reported exactly that by
+    dropping zero rates before comparing.
     """
-    final = df[df["round"] == df["round"].max()]
-    rates = final["enforcement_rate"].to_numpy(dtype=float)
-    rates = rates[np.isfinite(rates) & (rates > 0)]
-    if rates.size == 0:
+    final = df[df["round"] == df["round"].max()].set_index("district")
+    num = float(final.loc[numerator, "enforcement_rate"])
+    den = float(final.loc[denominator, "enforcement_rate"])
+    if not np.isfinite(num) or not np.isfinite(den):
         return float("nan")
-    return float(rates.max() / rates.min())
+    if den == 0:
+        return float("inf") if num > 0 else float("nan")
+    return num / den
