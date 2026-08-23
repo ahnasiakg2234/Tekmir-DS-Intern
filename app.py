@@ -125,9 +125,9 @@ with st.expander("What this model assumes, and what it cannot tell you"):
     st.markdown(
         """
 **The load-bearing assumption.** Arrests scale with patrol: send twice the officers,
-record roughly twice the arrests for the same underlying behaviour. Everything here
-follows from that. It is well supported for offences that are roughly evenly
-distributed and discovered through proximity, and much weaker for offences that come
+record roughly twice the arrests for the same underlying behavior. Everything here
+follows from that. It is well supported for offenses that are roughly evenly
+distributed and discovered through proximity, and much weaker for offenses that come
 to police through victim reports.
 
 **Why the proportional case is not obvious.** At concentration 1.0 both districts'
