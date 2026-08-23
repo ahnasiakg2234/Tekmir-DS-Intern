@@ -7,7 +7,7 @@
 ```bash
 pip install -r requirements.txt
 streamlit run app.py
-python test_simulation.py   # 9 sanity checks
+python3 test_simulation.py   #verification checks!!
 ```
 
 ## What it is
